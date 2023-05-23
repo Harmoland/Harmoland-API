@@ -1,0 +1,43 @@
+[project]
+name = "fastapi-test"
+version = "1.0.0"
+description = ""
+authors = [
+    {name = "Redlnn", email = "w731347477@gmail.com"},
+]
+dependencies = [
+    "uvicorn[standard]",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "python-multipart",
+    "sqlalchemy[asyncio]>=2.0.13",
+    "pydantic",
+    "orjson",
+    "fastapi",
+    "MCDReforged>=2.8.4",
+    "asyncmy>=0.2.7",
+    "aiosqlite>=0.19.0",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool]
+
+[tool.pdm]
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "isort",
+    "black",
+]
+
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311"]
+
+[tool.isort]
+profile = "black"
