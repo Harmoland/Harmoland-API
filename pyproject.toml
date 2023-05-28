@@ -6,17 +6,18 @@ authors = [
     {name = "Redlnn", email = "w731347477@gmail.com"},
 ]
 dependencies = [
-    "uvicorn[standard]",
-    "python-jose[cryptography]",
-    "passlib[bcrypt]",
-    "python-multipart",
-    "sqlalchemy[asyncio]>=2.0.13",
-    "pydantic",
-    "orjson",
+    "aiosqlite",
+    "asyncmy",
     "fastapi",
-    "MCDReforged>=2.8.4",
-    "asyncmy>=0.2.7",
-    "aiosqlite>=0.19.0",
+    "loguru",
+    "MCDReforged",
+    "orjson",
+    "passlib[bcrypt]",
+    "pydantic",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "sqlalchemy[asyncio]",
+    "uvicorn[standard]",
 ]
 requires-python = ">=3.10"
 license = {text = "MIT"}
