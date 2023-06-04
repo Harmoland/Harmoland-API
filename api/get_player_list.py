@@ -1,13 +1,13 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.sql import select
 
 from libs import db
 from libs.database.model import BannedQQList, Player, UUIDList
 from libs.server import route
-from util import BaseModel, BaseResponse
+from util import BaseModel, BaseResponse, oauth2_scheme
 
 
 class PlayerInfo(BaseModel):
@@ -31,10 +31,10 @@ class PlayersResponse(BaseResponse):
     summary='获取所有玩家列表',
     tags=['玩家'],
 )
-async def get_players_list():
+async def get_players_list(token=Depends(oauth2_scheme)):
     result = await db.select_all(select(Player))
     if result is None:
-        raise HTTPException(status_code=404, detail="未知的玩家")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="未知的玩家")
     return PlayersResponse(data=[_[0] for _ in result])
 
 
@@ -74,12 +74,12 @@ class PlayerResponse(BaseResponse):
     summary='获取单个玩家/UUID的信息',
     tags=['玩家', '白名单'],
 )
-async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None):
+async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None, token=Depends(oauth2_scheme)):
     # sourcery skip: remove-redundant-if
     if qq is None and uuid is not None:
         wl_info = await db.select_first(select(UUIDList).where(UUIDList.uuid == uuid))
         if wl_info is None:
-            raise HTTPException(status_code=404, detail="未知的玩家")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="未知的玩家")
         info = await db.select_first(select(Player).where(Player.qq == wl_info[0].qq))
         ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == wl_info[0].qq))
         ban_info = None if ban_info is None else ban_info[0]
@@ -90,7 +90,7 @@ async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None
     elif qq is not None and uuid is None:
         info = await db.select_first(select(Player).where(Player.qq == qq))
         if info is None:
-            raise HTTPException(status_code=404, detail="未知的玩家")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="未知的玩家")
         ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))
         ban_info = None if ban_info is None else ban_info[0]
         wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == qq))
@@ -98,6 +98,6 @@ async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None
             data={'basic': info[0], 'banInfo': ban_info, 'whitelistInfo': [_[0] for _ in wl_info]}  # type: ignore
         )
     elif qq is None and uuid is None:
-        raise HTTPException(status_code=400, detail="参数错误，至少需要传入一个参数")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误，至少需要传入一个参数")
     else:
-        raise HTTPException(status_code=400, detail="参数错误，QQ和UUID不可同时传入")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误，QQ和UUID不可同时传入")

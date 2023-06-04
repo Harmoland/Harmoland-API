@@ -1,12 +1,13 @@
 from typing import List
 from uuid import UUID
 
+from fastapi import Depends
 from sqlalchemy.sql import select
 
 from libs import db
 from libs.database.model import UUIDList
 from libs.server import route
-from util import BaseModel, BaseResponse
+from util import BaseModel, BaseResponse, oauth2_scheme
 
 
 class BannedUUID(BaseModel):
@@ -41,6 +42,6 @@ class UUIDListResponse(BaseResponse):
     summary='获取所有白名单的列表',
     tags=['白名单'],
 )
-async def get_uuid_list():
+async def get_uuid_list(token=Depends(oauth2_scheme)):
     all_uuid = await db.select_all(select(UUIDList))
     return UUIDListResponse(data=[_[0] for _ in all_uuid])

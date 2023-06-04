@@ -10,8 +10,8 @@ from util import WsConnectionManager
 manager = WsConnectionManager()
 
 
-async def handler(log):
-    await manager.broadcast(log)
+# async def handler(log):
+#     await manager.broadcast(log)
 
 
 # logger.add(handler, colorize=True, serialize=True)
@@ -20,6 +20,7 @@ async def handler(log):
 @route.ws("/log")
 async def logger_broadcast(client: WebSocket):
     # print(client['subprotocols'])  # list[str]
+    # TODO: verify_token
     await manager.connect(client)
     await manager.broadcast('有新连接~')
     await client.send_text('早~哦哈哟')

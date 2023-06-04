@@ -1,12 +1,13 @@
 from typing import List
 from uuid import UUID
 
+from fastapi import Depends
 from sqlalchemy.sql import select
 
 from libs import db
 from libs.database.model import BannedQQList, BannedUUIDList
 from libs.server import route
-from util import BaseModel, BaseResponse
+from util import BaseModel, BaseResponse, oauth2_scheme
 
 
 class BannedQQ(BaseModel):
@@ -31,9 +32,8 @@ class BannedQQResponse(BaseResponse):
     summary='获取所有被 Ban 的 QQ',
     tags=['封禁'],
 )
-async def get_banned_qq():
+async def get_banned_qq(token=Depends(oauth2_scheme)):
     ban_info = await db.select_all(select(BannedQQList))
-    print(ban_info)
     return BannedQQResponse(data=[_[0] for _ in ban_info])
 
 
@@ -60,6 +60,6 @@ class BannedUUIDResponse(BaseResponse):
     description='',
     tags=['封禁'],
 )
-async def get_banned_uuid():
+async def get_banned_uuid(token=Depends(oauth2_scheme)):
     ban_info = await db.select_all(select(BannedUUIDList))
     return BannedUUIDResponse(data=[_[0] for _ in ban_info])

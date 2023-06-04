@@ -5,10 +5,13 @@ from typing import Any, Dict, List, Union
 
 import orjson
 from fastapi import WebSocketDisconnect, status
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.websockets import WebSocket
 from loguru import logger
 from pydantic import BaseModel as PyDanticBaseModel
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 class LoguruHandler(logging.Handler):
