@@ -28,6 +28,12 @@ for name in logging.root.manager.loggerDict:
     for handler in _logger.handlers:
         if isinstance(handler, StreamHandler):
             _logger.removeHandler(handler)
+
+for name in "uvicorn.error", "uvicorn.asgi", "uvicorn.access":
+    target = logging.getLogger(name)
+    target.addHandler(loguru_handler)
+    target.propagate = False
+
 logger.remove()
 logger.add(sys.stderr, level='INFO', enqueue=True)
 
