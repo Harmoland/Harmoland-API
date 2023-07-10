@@ -16,7 +16,6 @@ dependencies = [
     "python-multipart>=0.0.6",
     "sqlalchemy[asyncio]>=2.0.18",
     "uvicorn[standard]>=0.22.0",
-    "mctools>=1.2.2",
     "rcon>=2.3.9",
     "launart>=0.6.3,<0.7",
     "graia-amnesia>=0.7.1,<0.8",
@@ -51,7 +50,7 @@ select = [
     "F",  # pyflakes
     "UP", # pyupgrade
     "I",  # isort
-    "D",  # pydocstyle
+    # "D",  # pydocstyle
     "ASYNC", # flake8-async
 ]
 exclude = [
@@ -60,7 +59,7 @@ exclude = [
     "__pypackages__",
     "dist",
 ]
-ignore = ["D100", "D101", "D102", "D103", "D104", "D106", "D107", "F401"]
+ignore = ["F401"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

@@ -209,12 +209,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mctools"
-version = "1.2.2"
-requires_python = ">=3.6, <4"
-summary = "Python implementations of common Minecraft protocols."
-
-[[package]]
 name = "multidict"
 version = "6.0.4"
 requires_python = ">=3.7"
@@ -542,7 +536,7 @@ dependencies = [
 lock_version = "4.2"
 cross_platform = true
 groups = ["default", "dev"]
-content_hash = "sha256:d2f81fd9a64a4483241d1f8076b8344a8873642e0db9444b25698248f8bf6c1c"
+content_hash = "sha256:8f46c4533be803cc400a7d77ceec4fed84456e75047134a6b8eee70a7e0c2174"
 
 [metadata.files]
 "aiosqlite 0.19.0" = [
@@ -984,10 +978,6 @@ content_hash = "sha256:d2f81fd9a64a4483241d1f8076b8344a8873642e0db9444b25698248f
 "mcdreforged 2.9.1" = [
     {url = "https://files.pythonhosted.org/packages/3e/f6/db6ffb8fec6ee9309f7904881212702f31265d6ca756379b76309a83e03f/mcdreforged-2.9.1.tar.gz", hash = "sha256:97cdb398d1736d2668fec6ec042e01181bc1e640ab16ee834212ab5b74a29b0a"},
     {url = "https://files.pythonhosted.org/packages/94/3a/2d68b8045a81a36f4baee113cf0fb52daaeff62487f64733d6ad2151d2e1/mcdreforged-2.9.1-py3-none-any.whl", hash = "sha256:6292b20a5ca5da2ab7ee370e411c5b986985b81804accf06158424dd4bc91bac"},
-]
-"mctools 1.2.2" = [
-    {url = "https://files.pythonhosted.org/packages/ba/7c/46580f73aaa58affd77d8d91b5b24745447e6a5cb6610ce1851af58e3364/mctools-1.2.2.tar.gz", hash = "sha256:2ab2214903fe32ee53e49d7ef501a539f433d0875e80bc0e5ed8ccd8b3b8ffa1"},
-    {url = "https://files.pythonhosted.org/packages/ea/d4/427925fdd835b56f2e2c38fe7a03033219c1b1bc4e20e6e66b1a7e450a03/mctools-1.2.2-py3-none-any.whl", hash = "sha256:02352004bd6546a0ee47971751154aa93646e176e4eb35cf593774b66ddf802c"},
 ]
 "multidict 6.0.4" = [
     {url = "https://files.pythonhosted.org/packages/00/bb/1cdffe9b1ab01830bc9255a64524c34b71c20a4affe5d1000b223a41698d/multidict-6.0.4-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ddd3915998d93fbcd2566ddf9cf62cdb35c9e093075f862935573d265cf8f65d"},
