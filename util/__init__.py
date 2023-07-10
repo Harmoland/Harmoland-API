@@ -1,17 +1,14 @@
 import logging
 import sys
 from contextlib import suppress
-from typing import Any, Dict, List, Union
+from typing import Any
 
-import orjson
 from fastapi import WebSocketDisconnect, status
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.websockets import WebSocket
 from loguru import logger
-from pydantic import BaseModel as PyDanticBaseModel
+from pydantic import BaseModel
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 class LoguruHandler(logging.Handler):
@@ -31,21 +28,10 @@ class LoguruHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def orjson_dumps(v, *, default, **dumps_kwargs):
-    # orjson.dumps returns bytes, to match standard json.dumps we need to decode
-    return orjson.dumps(v, default=default, **dumps_kwargs).decode()
-
-
-class BaseModel(PyDanticBaseModel):
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
-
-
 class BaseResponse(BaseModel):
     code: int = status.HTTP_200_OK
     message: str = "success"
-    data: Union[Dict[str, Any], BaseModel, List[Any], List[BaseModel], None] = None
+    data: dict[str, Any] | BaseModel | list[Any] | list[BaseModel] | None = None
 
 
 class WsConnectionManager:
@@ -94,3 +80,7 @@ class WsConnectionManager:
                 RuntimeError,
             ):
                 self.disconnect(connection)
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+loguru_handler = LoguruHandler()

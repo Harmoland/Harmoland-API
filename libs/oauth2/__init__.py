@@ -1,6 +1,6 @@
 import secrets
+from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
-from typing import Mapping
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.sql import select
 
-from libs import db
+from libs.database import db
 from libs.database.model import User
 
 # to get a string like this run:
@@ -31,13 +31,13 @@ class UnauthorizedException(HTTPException):
 
 
 async def get_user(qq: str) -> User | None:
-    """从数据库中查询用户信息"""
+    """从数据库中查询用户信息."""
     result = await db.select_first(select(User).where(User.qq == qq))
     return result[0] if result is not None else None
 
 
 def verify_password(plain_password, hashed_password) -> bool:
-    """验证密码
+    """验证密码.
 
     Args:
         plain_password(str): 明文密码
@@ -49,17 +49,18 @@ def verify_password(plain_password, hashed_password) -> bool:
 
 
 def get_password_hash(plain_password) -> str:
-    """获取哈希后的密码
+    """获取哈希后的密码.
+
     Args:
         plain_password(str): 明文密码
     Returns:
-        hashed_password(str): 哈希后的密码
+        hashed_password(str): 哈希后的密码.
     """
     return pwd_context.hash(plain_password)
 
 
 async def authenticate_user(qq: str, plain_password: str) -> User:
-    """验证用户名和密码
+    """验证用户名和密码.
 
     Args:
         qq(str): QQ号
@@ -80,7 +81,7 @@ def create_token(
     expires_delta: timedelta | None = timedelta(minutes=30),
     scopes: list[str] | None = None,
 ) -> str:
-    """创建 JWT Token
+    """创建 JWT Token.
 
     Args:
         data(dict): 包含用户信息的字典. {'sub': user_info}
@@ -108,7 +109,7 @@ def create_token(
 
 
 async def verify_token(token: str = Depends(oauth2_scheme)) -> User:
-    """获取当前用户信息
+    """获取当前用户信息.
 
     用于验证用户是否登录，作为 FastAPI 的 Depends 使用
 
@@ -119,12 +120,12 @@ async def verify_token(token: str = Depends(oauth2_scheme)) -> User:
     """
     try:
         payload: Mapping = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        qq: str = payload.get('sub', None)
+        qq: str = payload.get("sub", None)
         if qq is None:
-            raise UnauthorizedException(detail='无效的用户')
+            raise UnauthorizedException(detail="无效的用户")
     except JWTError as e:
-        raise UnauthorizedException(detail='无效的 Token 或 Token 已过期') from e
+        raise UnauthorizedException(detail="无效的 Token 或 Token 已过期") from e
     user = await get_user(qq=qq)
     if user is None:
-        raise UnauthorizedException(detail='无效的用户')
+        raise UnauthorizedException(detail="无效的用户")
     return user

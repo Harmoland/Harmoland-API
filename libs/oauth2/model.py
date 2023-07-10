@@ -1,4 +1,4 @@
-from util import BaseModel
+from pydantic import BaseModel
 
 
 class Token(BaseModel):

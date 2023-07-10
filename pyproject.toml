@@ -2,25 +2,27 @@
 name = "fastapi-test"
 version = "1.0.0"
 description = ""
-authors = [
-    {name = "Redlnn", email = "w731347477@gmail.com"},
-]
+authors = [{ name = "Redlnn", email = "w731347477@gmail.com" }]
 dependencies = [
-    "aiosqlite",
-    "asyncmy",
-    "fastapi",
-    "loguru",
-    "MCDReforged",
-    "orjson",
-    "passlib[bcrypt]",
-    "pydantic",
-    "python-jose[cryptography]",
-    "python-multipart",
-    "sqlalchemy[asyncio]",
-    "uvicorn[standard]",
+    "aiosqlite>=0.19.0",
+    "asyncmy>=0.2.8",
+    "fastapi>=0.100.0",
+    "loguru>=0.7.0",
+    "MCDReforged>=2.9.1",
+    "orjson>=3.9.2",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic>=2.0.2",
+    "python-jose[cryptography]>=3.3.0",
+    "python-multipart>=0.0.6",
+    "sqlalchemy[asyncio]>=2.0.18",
+    "uvicorn[standard]>=0.22.0",
+    "mctools>=1.2.2",
+    "rcon>=2.3.9",
+    "launart>=0.6.3,<0.7",
+    "graia-amnesia>=0.7.1,<0.8",
 ]
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 [build-system]
 requires = ["pdm-backend"]
@@ -31,10 +33,7 @@ build-backend = "pdm.backend"
 [tool.pdm]
 
 [tool.pdm.dev-dependencies]
-dev = [
-    "isort",
-    "black",
-]
+dev = ["isort", "black", "ruff"]
 
 [tool.black]
 line-length = 120
@@ -42,3 +41,26 @@ target-version = ["py310", "py311"]
 
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+select = [
+    # https://beta.ruff.rs/docs/rules
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "UP", # pyupgrade
+    "I",  # isort
+    "D",  # pydocstyle
+    "ASYNC", # flake8-async
+]
+exclude = [
+    ".git",
+    ".venv",
+    "__pypackages__",
+    "dist",
+]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D106", "D107", "F401"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

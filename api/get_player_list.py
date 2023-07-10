@@ -1,24 +1,23 @@
-from typing import List
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.sql import select
 
-from libs import db
+from libs.database import db
 from libs.database.model import BannedQQList, Player, UUIDList
 from libs.server import route
-from util import BaseModel, BaseResponse, oauth2_scheme
+from util import BaseResponse, oauth2_scheme
 
 
 class PlayerInfo(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     qq: int
     joinTime: int | None
     leaveTime: int | None
     inviter: int | None
     hadWhitelist: bool
-
-    class Config:
-        orm_mode = True
 
 
 class PlayersResponse(BaseResponse):
@@ -28,8 +27,8 @@ class PlayersResponse(BaseResponse):
 @route.get(
     "/api/get_playerlist",
     response_model=PlayersResponse,
-    summary='获取所有玩家列表',
-    tags=['玩家'],
+    summary="获取所有玩家列表",
+    tags=["玩家"],
 )
 async def get_players_list(token=Depends(oauth2_scheme)):
     result = await db.select_all(select(Player))
@@ -39,29 +38,27 @@ async def get_players_list(token=Depends(oauth2_scheme)):
 
 
 class WLInfo(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     uuid: UUID
     wlAddTime: int
     operater: int
 
-    class Config:
-        orm_mode = True
-
 
 class BannedQQ(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     qq: int
     banStartTime: int
     banEndTime: int
     banReason: str
     operater: int
 
-    class Config:
-        orm_mode = True
-
 
 class PlayerInfoFull(BaseModel):
     basic: PlayerInfo
     banInfo: BannedQQ | None
-    whitelistInfo: List[WLInfo] | None
+    whitelistInfo: list[WLInfo] | None
 
 
 class PlayerResponse(BaseResponse):
@@ -71,8 +68,8 @@ class PlayerResponse(BaseResponse):
 @route.get(
     "/api/get_player_info",
     response_model=PlayerResponse,
-    summary='获取单个玩家/UUID的信息',
-    tags=['玩家', '白名单'],
+    summary="获取单个玩家/UUID的信息",
+    tags=["玩家", "白名单"],
 )
 async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None, token=Depends(oauth2_scheme)):
     # sourcery skip: remove-redundant-if
@@ -85,7 +82,7 @@ async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None
         ban_info = None if ban_info is None else ban_info[0]
         wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == wl_info[0].qq))
         return PlayerResponse(
-            data={'basic': info[0], 'banInfo': ban_info, 'whitelistInfo': [_[0] for _ in wl_info]}  # type: ignore
+            data={"basic": info[0], "banInfo": ban_info, "whitelistInfo": [_[0] for _ in wl_info]}  # type: ignore
         )
     elif qq is not None and uuid is None:
         info = await db.select_first(select(Player).where(Player.qq == qq))
@@ -95,9 +92,9 @@ async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None
         ban_info = None if ban_info is None else ban_info[0]
         wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == qq))
         return PlayerResponse(
-            data={'basic': info[0], 'banInfo': ban_info, 'whitelistInfo': [_[0] for _ in wl_info]}  # type: ignore
+            data={"basic": info[0], "banInfo": ban_info, "whitelistInfo": [_[0] for _ in wl_info]}  # type: ignore
         )
     elif qq is None and uuid is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误，至少需要传入一个参数")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误,至少需要传入一个参数")
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误，QQ和UUID不可同时传入")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="参数错误,QQ和UUID不可同时传入")

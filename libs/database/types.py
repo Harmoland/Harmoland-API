@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, List, Literal, Optional, Type, Union
+from collections.abc import Callable
+from typing import Any, Literal
 
 from sqlalchemy.engine.interfaces import IsolationLevel, _ExecuteOptions, _ParamStyle
 from sqlalchemy.log import _EchoFlagType
@@ -7,9 +8,9 @@ from typing_extensions import TypedDict
 
 
 class EngineOptions(TypedDict, total=False):
-    connect_args: Dict[Any, Any]
+    connect_args: dict[Any, Any]
     convert_unicode: bool
-    creator: Union[_CreatorFnType, _CreatorWRecFnType]
+    creator: _CreatorFnType | _CreatorWRecFnType
     echo: _EchoFlagType
     echo_pool: _EchoFlagType
     enable_from_linting: bool
@@ -21,22 +22,22 @@ class EngineOptions(TypedDict, total=False):
     isolation_level: IsolationLevel
     json_deserializer: Callable[..., Any]
     json_serializer: Callable[..., Any]
-    label_length: Optional[int]
+    label_length: int | None
     logging_name: str
-    max_identifier_length: Optional[int]
+    max_identifier_length: int | None
     max_overflow: int
-    module: Optional[Any]
-    paramstyle: Optional[_ParamStyle]
-    pool: Optional[Pool]
-    poolclass: Optional[Type[Pool]]
+    module: Any | None
+    paramstyle: _ParamStyle | None
+    pool: Pool | None
+    poolclass: type[Pool] | None
     pool_logging_name: str
     pool_pre_ping: bool
     pool_size: int
     pool_recycle: int
-    pool_reset_on_return: Optional[_ResetStyleArgType]
+    pool_reset_on_return: _ResetStyleArgType | None
     pool_timeout: float
     pool_use_lifo: bool
-    plugins: List[str]
+    plugins: list[str]
     query_cache_size: int
     use_insertmanyvalues: bool
-    kwargs: Dict[str, Any]
+    kwargs: dict[str, Any]

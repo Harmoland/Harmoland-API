@@ -22,8 +22,8 @@ async def logger_broadcast(client: WebSocket):
     # print(client['subprotocols'])  # list[str]
     # TODO: verify_token
     await manager.connect(client)
-    await manager.broadcast('有新连接~')
-    await client.send_text('早~哦哈哟')
+    await manager.broadcast("有新连接~")
+    await client.send_text("早~哦哈哟")
     while True:
         try:
             text = await client.receive_text()

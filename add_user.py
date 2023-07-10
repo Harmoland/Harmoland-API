@@ -1,13 +1,13 @@
 import asyncio
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy.sql import select
 
-from libs.database import DatabaseManager
+from libs.database.manager import DatabaseManager
 from libs.database.model import User
-from libs.oauth2 import get_password_hash, verify_password
+from libs.oauth2 import verify_password
 
-db = DatabaseManager('sqlite+aiosqlite:///data/harmoland-console.db')
+db = DatabaseManager("sqlite+aiosqlite:///data/harmoland-console.db")
 
 
 async def main():
@@ -20,13 +20,13 @@ async def main():
 
     try:
         result: Sequence[User] | None = await db.select_first(select(User).where(User.qq == 731347477))
-        print('result: ', result)
+        print("result: ", result)
         if result is None:
-            print('None')
+            print("None")
             return
-        print(verify_password('test', result[0].passwd))
+        print(verify_password("test", result[0].passwd))
     except Exception as e:
-        print(f'\nError: {e}\n')
+        print(f"\nError: {e}\n")
 
 
 asyncio.run(main())
