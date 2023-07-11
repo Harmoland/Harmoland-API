@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from fastapi import Depends, status
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.sql import select
 
@@ -29,7 +30,8 @@ async def add_or_modify_player(
     if not ignore_ban:
         ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))
         if ban_info is not None:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="该QQ号已被Ban")
+            return BaseResponse(code=status.HTTP_403_FORBIDDEN, message="该QQ号已被Ban")
+
     result = await db.select_first(select(Player).where(Player.qq == qq))
     flag = result is not None
     if result is not None:
@@ -72,17 +74,17 @@ async def add_new_whitelist(
     if not ignore_ban:
         ban_qq_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))
         if ban_qq_info is not None:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="该QQ号已被Ban")
+            return BaseResponse(code=status.HTTP_403_FORBIDDEN, message="该QQ号已被Ban")
         ban_uuid_info = await db.select_first(select(BannedUUIDList).where(BannedUUIDList.uuid == uuid))
         if ban_uuid_info is not None:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="该UUID已被Ban")
+            return BaseResponse(code=status.HTTP_403_FORBIDDEN, message="该UUID已被Ban")
 
     result = await db.select_first(select(UUIDList).where(UUIDList.uuid == UUID))
     if result is not None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="该UUID已被添加白名单")
+        return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该UUID已被添加白名单")
     result = await db.select_first(select(Player).where(Player.qq == qq))
     if result is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先添加该QQ号对应的Player")
+        return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="请先添加该QQ号对应的Player")
     await db.update_or_add(
         Player(
             qq=qq,

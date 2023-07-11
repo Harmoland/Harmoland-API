@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from sqlalchemy.sql import select
 
 from libs.database import db
@@ -96,7 +96,7 @@ async def ban_uuid(
 async def pardon_player(ban_id: int, token=Depends(oauth2_scheme)):
     result = await db.select_first(select(BannedQQList).where(BannedQQList.id == ban_id))
     if result is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="该 BanID 不存在")
+        return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该 BanID 不存在")
     await db.update_or_add(
         BannedQQList(
             id=result[0].id,
@@ -121,7 +121,7 @@ async def pardon_player(ban_id: int, token=Depends(oauth2_scheme)):
 async def pardon_uuid(ban_id: int, token=Depends(oauth2_scheme)):
     result = await db.select_first(select(BannedUUIDList).where(BannedUUIDList.id == ban_id))
     if result is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="该 BanID 不存在")
+        return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该 BanID 不存在")
     await db.update_or_add(
         BannedUUIDList(
             id=result[0].id,
