@@ -20,7 +20,7 @@ class RconService(Service):
         port: int,
         *,
         passwd: str,
-        encoding: str = 'utf-8',
+        encoding: str = "utf-8",
     ) -> None:
         super().__init__()
         self.encoding = encoding

@@ -5,17 +5,17 @@ from fastapi.responses import ORJSONResponse
 from libs.database.manager import DatabaseManager
 
 app = FastAPI(
-    title='Harmoland Console',
-    description='API of Harmoland Console',
+    title="Harmoland Console",
+    description="API of Harmoland Console",
     default_response_class=ORJSONResponse,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-db = DatabaseManager('sqlite+aiosqlite:///data/harmoland-console.db')
+db = DatabaseManager("sqlite+aiosqlite:///data/harmoland-console.db")

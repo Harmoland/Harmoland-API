@@ -22,9 +22,9 @@ class RconClient:
         port: int,
         *,
         passwd: str,
-        encoding: str = 'utf-8',
+        encoding: str = "utf-8",
         frag_threshold: int = 4096,
-        frag_detect_cmd: str = '',
+        frag_detect_cmd: str = "",
     ) -> None:
         self.encoding = encoding
         self.host = host
@@ -40,7 +40,7 @@ class RconClient:
             self.reader, self.writer = await open_connection(self.host, self.port)
             response = await self.communicate(Packet.make_login(self.passwd, encoding=self.encoding))
         except Exception as e:
-            logger.exception('Failed to connect rcon server', e)
+            logger.exception("Failed to connect rcon server", e)
         else:
             # Wait for SERVERDATA_AUTH_RESPONSE according to:
             # https://developer.valvesoftware.com/wiki/Source_RCON_Protocol
