@@ -7,7 +7,7 @@ from aiohttp import ClientResponse
 from graia.amnesia.builtins.aiohttp import AiohttpClientInterface
 from launart import Launart
 
-from typings import Resp
+from typings import HttpResp
 
 
 def format_time(timestamp: int) -> str:
@@ -42,7 +42,7 @@ async def is_uuid(mc_uuid: str) -> Literal[False] | UUID:
         return _
 
 
-async def get_uuid(mc_id: str) -> tuple[str, UUID] | tuple[Resp, None]:
+async def get_uuid(mc_id: str) -> tuple[str, UUID] | tuple[HttpResp, None]:
     """
     通过 id 从 Mojang 获取 uuid
 
@@ -54,14 +54,16 @@ async def get_uuid(mc_id: str) -> tuple[str, UUID] | tuple[Resp, None]:
     async with session.get(f"https://api.mojang.com/users/profiles/minecraft/{mc_id}") as resp:
         if resp.status != 200:
             return (
-                Resp(status=resp.status, headers=dict(resp.headers), charset=resp.charset, content=await resp.text()),
+                HttpResp(
+                    status=resp.status, headers=dict(resp.headers), charset=resp.charset, content=await resp.text()
+                ),
                 None,
             )
         resp_json = await resp.json()
         return resp_json["name"], UUID(resp_json["id"])
 
 
-async def get_mc_id(mc_uuid: str | UUID) -> str | Resp:
+async def get_mc_id(mc_uuid: str | UUID) -> str | HttpResp:
     """
     通过 uuid 从 Mojang 获取正版 id
 
@@ -72,6 +74,8 @@ async def get_mc_id(mc_uuid: str | UUID) -> str | Resp:
 
     async with session.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{mc_uuid}") as resp:
         if resp.status != 200:
-            return Resp(status=resp.status, headers=dict(resp.headers), charset=resp.charset, content=await resp.text())
+            return HttpResp(
+                status=resp.status, headers=dict(resp.headers), charset=resp.charset, content=await resp.text()
+            )
         resp_json = await resp.json()
         return resp_json["name"]

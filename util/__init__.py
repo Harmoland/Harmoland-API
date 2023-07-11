@@ -6,9 +6,12 @@ from typing import Any
 from fastapi import WebSocketDisconnect, status
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.websockets import WebSocket
+from launart import Launart
 from loguru import logger
 from pydantic import BaseModel
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+
+from libs.rcon.interface import Rcon
 
 
 class LoguruHandler(logging.Handler):
@@ -80,6 +83,10 @@ class WsConnectionManager:
                 RuntimeError,
             ):
                 self.disconnect(connection)
+
+
+async def get_rcon_client() -> Rcon:
+    return Launart.current().get_interface(Rcon)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")

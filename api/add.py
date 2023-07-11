@@ -1,13 +1,15 @@
 from uuid import UUID
 
 from fastapi import Depends, status
-from fastapi import Depends, HTTPException, status
+from loguru import logger
 from sqlalchemy.sql import select
 
 from libs.database import db
 from libs.database.model import BannedQQList, BannedUUIDList, Player, UUIDList
 from libs.server import route
-from util import BaseResponse, oauth2_scheme
+from typings import HttpErrorResponse
+from util import BaseResponse, get_rcon_client, oauth2_scheme
+from util.minecraft import get_mc_id
 
 
 @route.post(
@@ -62,7 +64,7 @@ async def add_or_modify_player(
 
 @route.post(
     "/api/add_new_whitelist",
-    response_model=BaseResponse,
+    response_model=BaseResponse | HttpErrorResponse,
     summary="添加新UUID（白名单）",
     description="该接口可以添加一个白名单，退群或被 T 或被 Ban 时应移除该白名单",
     tags=["白名单"],
@@ -95,4 +97,36 @@ async def add_new_whitelist(
         )
     )
     await db.update_or_add(UUIDList(uuid=uuid, qq=qq, wlAddTime=add_time, operater=operater))
-    return BaseResponse()
+
+    try:
+        mc_id = await get_mc_id(uuid)
+    except Exception as e:
+        logger.exception(f"无法查询【{uuid}】对应的正版id", e)
+        return BaseResponse(
+            code=status.HTTP_204_NO_CONTENT,
+            message=f"查询【{uuid}】对应的正版id时出错",
+            data={"error": str(e)},
+        )
+
+    if isinstance(mc_id, str):
+        rcon_client = await get_rcon_client()
+        try:
+            result = await rcon_client.send(f"whitelist add {mc_id}")
+        except Exception as e:
+            logger.exception(f"无法执行 Rcon 命令：【whitelist add {mc_id}】", e)
+            return BaseResponse(
+                code=status.HTTP_204_NO_CONTENT,
+                message=f"无法执行 Rcon 命令：【whitelist add {mc_id}】",
+                data={"error": str(e)},
+            )
+        else:
+            if result.startswith("Added"):
+                return BaseResponse()
+            else:
+                return BaseResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, message=result)
+    else:
+        return HttpErrorResponse(
+            code=mc_id.status,
+            message=f"向 mojang 查询【{uuid}】的正版 id 时获得意外内容",
+            data=mc_id,
+        )
