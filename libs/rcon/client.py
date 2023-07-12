@@ -1,3 +1,4 @@
+import asyncio
 from asyncio import StreamReader, StreamWriter, open_connection
 
 from loguru import logger
@@ -80,10 +81,21 @@ class RconClient:
 
         return response
 
+    async def try_reconect(self) -> bool:
+        if self.retry_count >= 10:
+            return False
+        if self.retry_count > 0:
+            await asyncio.sleep(10)
+        await self.connect()
+        self.retry_count += 1
+        return True if self.connected else await self.try_reconect()
+
     async def send(self, command: str, *arguments: str) -> str:
         """Run a command asynchronously."""
         if not self.connected:
-            await self.connect()
+            res = await self.try_reconect()
+            if not res:
+                raise ValueError('Can not connect rcon server after 10 times retry.')
         request = Packet.make_command(command, *arguments, encoding=self.encoding)
         response = await self.communicate(request)
 
