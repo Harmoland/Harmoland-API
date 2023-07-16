@@ -1,25 +1,24 @@
 [project]
-name = "fastapi-test"
+name = "Harmoland-API"
 version = "1.0.0"
-description = ""
+description = "一个用于Harmoland服务器的API，具有白名单和群成员管理功能"
 authors = [{ name = "Redlnn", email = "w731347477@gmail.com" }]
 dependencies = [
+    "aiohttp[speedups]>=3.8.4",
     "aiosqlite>=0.19.0",
     "asyncmy>=0.2.8",
     "fastapi>=0.100.0",
+    "graia-amnesia>=0.7.1,<0.8",
+    "launart>=0.6.3,<0.7",
     "loguru>=0.7.0",
-    "MCDReforged>=2.9.1",
     "orjson>=3.9.2",
     "passlib[bcrypt]>=1.7.4",
     "pydantic>=2.0.2",
     "python-jose[cryptography]>=3.3.0",
     "python-multipart>=0.0.6",
+    "rcon>=2.3.9",
     "sqlalchemy[asyncio]>=2.0.18",
     "uvicorn[standard]>=0.22.0",
-    "rcon>=2.3.9",
-    "launart>=0.6.3,<0.7",
-    "graia-amnesia>=0.7.1,<0.8",
-    "aiohttp[speedups]>=3.8.4",
 ]
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -29,9 +28,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool]
-
 [tool.pdm]
-
 [tool.pdm.dev-dependencies]
 dev = ["isort", "black", "ruff"]
 
