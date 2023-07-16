@@ -25,14 +25,14 @@ async def ban_player(
 
     # 搜索是否已有白名单，有的话就删除
     wl_result = await db.select_all(select(UUIDList).where(UUIDList.qq == qq))
-    if wl_result is None or len(wl_result) == 0:
+    if not any(wl_result):
         return BaseResponse()
 
-    player_result = await db.select_first(select(Player).where(Player.qq == wl_result[0].qq))
+    player_result = await db.select_first(select(Player).where(Player.qq == qq))
     if player_result is not None and player_result[0].hadWhitelist:
         await db.update_or_add(
             Player(
-                qq=player_result[0].qq or wl_result[0].qq,
+                qq=player_result[0].qq or qq,
                 joinTime=player_result[0].joinTime or None,
                 leaveTime=player_result[0].leaveTime or None,
                 inviter=player_result[0].inviter or None,
@@ -67,15 +67,16 @@ async def ban_uuid(
     wl_result = await db.select_first(select(UUIDList).where(UUIDList.uuid == uuid))
     if wl_result is None:
         return BaseResponse()
+    qq = wl_result[0].qq
     await db.delete_exist(wl_result)
 
     wl_result = await db.select_all(select(UUIDList).where(UUIDList.uuid == uuid))
-    if wl_result is None or len(wl_result) == 0:
-        player_result = await db.select_first(select(Player).where(Player.qq == wl_result[0].qq))
+    if not any(wl_result):
+        player_result = await db.select_first(select(Player).where(Player.qq == qq))
         if player_result is not None and player_result[0].hadWhitelist:
             await db.update_or_add(
                 Player(
-                    qq=player_result[0].qq or wl_result[0].qq,
+                    qq=player_result[0].qq or qq,
                     joinTime=player_result[0].joinTime or None,
                     leaveTime=player_result[0].leaveTime or None,
                     inviter=player_result[0].inviter or None,
@@ -101,9 +102,9 @@ async def pardon_player(ban_id: int, token=Depends(oauth2_scheme)):
         BannedQQList(
             id=result[0].id,
             qq=result[0].qq,
-            banStartTime=result[0].ban_start_time,
-            banEndTime=result[0].ban_end_time,
-            banReason=result[0].ban_reason,
+            banStartTime=result[0].banStartTime,
+            banEndTime=result[0].banEndTime,
+            banReason=result[0].banReason,
             pardon=True,
             operater=result[0].operater,
         )
@@ -126,9 +127,9 @@ async def pardon_uuid(ban_id: int, token=Depends(oauth2_scheme)):
         BannedUUIDList(
             id=result[0].id,
             uuid=result[0].uuid,
-            banStartTime=result[0].ban_start_time,
-            banEndTime=result[0].ban_end_time,
-            banReason=result[0].ban_reason,
+            banStartTime=result[0].banStartTime,
+            banEndTime=result[0].banEndTime,
+            banReason=result[0].banReason,
             pardon=True,
             operater=result[0].operater,
         )

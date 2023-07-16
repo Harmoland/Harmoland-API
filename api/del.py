@@ -19,15 +19,16 @@ async def del_uuid(uuid: UUID, token=Depends(oauth2_scheme)):
     wl_result = await db.select_first(select(UUIDList).where(UUIDList.uuid == uuid))
     if wl_result is None:
         return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该UUID没有白名单")
+    qq = wl_result[0].qq
     await db.delete_exist(wl_result)
 
     wl_result = await db.select_all(select(UUIDList).where(UUIDList.uuid == uuid))
-    if wl_result is None or len(wl_result) == 0:
-        player_result = await db.select_first(select(Player).where(Player.qq == wl_result[0].qq))
+    if not any(wl_result):
+        player_result = await db.select_first(select(Player).where(Player.qq == qq))
         if player_result is not None and player_result[0].hadWhitelist:
             await db.update_or_add(
                 Player(
-                    qq=player_result[0].qq or wl_result[0].qq,
+                    qq=player_result[0].qq or qq,
                     joinTime=player_result[0].joinTime or None,
                     leaveTime=player_result[0].leaveTime or None,
                     inviter=player_result[0].inviter or None,
@@ -46,14 +47,14 @@ async def del_uuid(uuid: UUID, token=Depends(oauth2_scheme)):
 async def del_uuid_by_qq(qq: int, token=Depends(oauth2_scheme)):
     wl_result = await db.select_all(select(UUIDList).where(UUIDList.qq == qq))
 
-    if wl_result is None or len(wl_result) == 0:
+    if not any(wl_result):
         return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该QQ没有白名单")
 
-    player_result = await db.select_first(select(Player).where(Player.qq == wl_result[0].qq))
+    player_result = await db.select_first(select(Player).where(Player.qq == wl_result[0][0].qq))
     if player_result is not None and player_result[0].hadWhitelist:
         await db.update_or_add(
             Player(
-                qq=player_result[0].qq or wl_result[0].qq,
+                qq=player_result[0].qq or wl_result[0][0].qq,
                 joinTime=player_result[0].joinTime or None,
                 leaveTime=player_result[0].leaveTime or None,
                 inviter=player_result[0].inviter or None,

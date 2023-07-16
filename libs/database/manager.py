@@ -1,9 +1,8 @@
 import contextlib
 from asyncio import current_task
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, TypeVar, cast
 
-from sqlalchemy.engine import Row
 from sqlalchemy.engine.result import Result
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.asyncio import (
@@ -14,12 +13,14 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.sql.base import Executable
+from sqlalchemy.sql.expression import Select
 
 from libs.database.model import Base
 from libs.database.types import EngineOptions
 
 # sqlite_url = 'sqlite+aiosqlite:///data/redbot.db'
 # mysql_url = 'mysql+aiomysql://user:pass@hostname/dbname?charset=utf8mb4
+T_Row = TypeVar('T_Row', bound=Base)
 
 
 class DatabaseManager:
@@ -95,13 +96,13 @@ class DatabaseManager:
         async with self.async_session() as session:
             return await session.execute(sql)
 
-    async def select_all(self, sql: Executable) -> Sequence[Row]:
+    async def select_all(self, sql: Select[tuple[T_Row]]) -> list[Sequence[T_Row]]:
         result = await self.exec(sql)
-        return result.all()
+        return cast(list[Sequence[T_Row]], result.all())
 
-    async def select_first(self, sql: Executable) -> Row | None:
+    async def select_first(self, sql: Select[tuple[T_Row]]) -> Sequence[T_Row] | None:
         result = await self.exec(sql)
-        return result.first()
+        return cast(Sequence[T_Row] | None, result.first())
 
     async def add(self, row):
         scoped_session = await self.async_safe_session()

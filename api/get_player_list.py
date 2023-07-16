@@ -1,3 +1,4 @@
+from typing import cast
 from uuid import UUID
 
 from fastapi import Depends, status
@@ -34,7 +35,7 @@ async def get_players_list(token=Depends(oauth2_scheme)):
     result = await db.select_all(select(Player))
     if result is None:
         return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
-    return PlayersResponse(data=[_[0] for _ in result])
+    return PlayersResponse(data=[cast(PlayerInfo, _[0]) for _ in result])
 
 
 class WLInfo(BaseModel):
