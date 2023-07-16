@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.sql.base import Executable
-from sqlalchemy.sql.expression import Select
+from sqlalchemy.sql.selectable import TypedReturnsRows
 
 from libs.database.model import Base
 from libs.database.types import EngineOptions
@@ -96,13 +96,23 @@ class DatabaseManager:
         async with self.async_session() as session:
             return await session.execute(sql)
 
-    async def select_all(self, sql: Select[tuple[T_Row]]) -> list[Sequence[T_Row]]:
-        result = await self.exec(sql)
-        return cast(list[Sequence[T_Row]], result.all())
+    # from sqlalchemy.sql.expression import Select
+    # async def select_all(self, sql: Select[tuple[T_Row]]) -> list[Sequence[T_Row]]:
+    #     result = await self.exec(sql)
+    #     return cast(list[Sequence[T_Row]], result.all())
+    # async def select_first(self, sql: Select[tuple[T_Row]]) -> Sequence[T_Row] | None:
+    #     result = await self.exec(sql)
+    #     return cast(Sequence[T_Row] | None, result.first())
 
-    async def select_first(self, sql: Select[tuple[T_Row]]) -> Sequence[T_Row] | None:
-        result = await self.exec(sql)
-        return cast(Sequence[T_Row] | None, result.first())
+    async def select_all(self, sql: TypedReturnsRows[tuple[T_Row]]) -> Sequence[T_Row]:
+        async with self.async_session() as session:
+            result = await session.scalars(sql)
+        return result.all()
+
+    async def select_first(self, sql: TypedReturnsRows[tuple[T_Row]]) -> T_Row | None:
+        async with self.async_session() as session:
+            result = await session.scalars(sql)
+        return cast(T_Row | None, result.first())
 
     async def add(self, row):
         scoped_session = await self.async_safe_session()

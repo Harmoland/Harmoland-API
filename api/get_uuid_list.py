@@ -43,4 +43,4 @@ class UUIDListResponse(BaseResponse):
 )
 async def get_uuid_list(token=Depends(oauth2_scheme)):
     all_uuid = await db.select_all(select(UUIDList))
-    return UUIDListResponse(data=[cast(UUIDInfo, _[0]) for _ in all_uuid])
+    return UUIDListResponse(data=[cast(UUIDInfo, _) for _ in all_uuid])

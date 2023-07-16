@@ -32,8 +32,7 @@ class UnauthorizedException(HTTPException):
 
 async def get_user(qq: str) -> User | None:
     """从数据库中查询用户信息."""
-    result = await db.select_first(select(User).where(User.qq == qq))
-    return result[0] if result is not None else None
+    return await db.select_first(select(User).where(User.qq == qq))
 
 
 def verify_password(plain_password, hashed_password) -> bool:

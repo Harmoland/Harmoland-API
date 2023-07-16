@@ -35,7 +35,7 @@ async def get_players_list(token=Depends(oauth2_scheme)):
     result = await db.select_all(select(Player))
     if result is None:
         return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
-    return PlayersResponse(data=[cast(PlayerInfo, _[0]) for _ in result])
+    return PlayersResponse(data=[cast(PlayerInfo, _) for _ in result])
 
 
 class WLInfo(BaseModel):
@@ -78,22 +78,31 @@ async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None
         wl_info = await db.select_first(select(UUIDList).where(UUIDList.uuid == uuid))
         if wl_info is None:
             return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
-        info = await db.select_first(select(Player).where(Player.qq == wl_info[0].qq))
-        ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == wl_info[0].qq))
-        ban_info = None if ban_info is None else ban_info[0]
-        wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == wl_info[0].qq))
+        info = await db.select_first(select(Player).where(Player.qq == wl_info.qq))
+        if info is None:
+            return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
+        ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == wl_info.qq))
+        ban_info = None if ban_info is None else ban_info
+        wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == wl_info.qq))
         return PlayerResponse(
-            data={"basic": info[0], "banInfo": ban_info, "whitelistInfo": [_[0] for _ in wl_info]}  # type: ignore
+            data=PlayerInfoFull(
+                basic=cast(PlayerInfo, info),
+                banInfo=cast(BannedQQ | None, ban_info),
+                whitelistInfo=None if any(wl_info) else [cast(WLInfo, _) for _ in wl_info],
+            )
         )
     elif qq is not None and uuid is None:
         info = await db.select_first(select(Player).where(Player.qq == qq))
         if info is None:
             return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
         ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))
-        ban_info = None if ban_info is None else ban_info[0]
         wl_info = await db.select_all(select(UUIDList).where(UUIDList.qq == qq))
         return PlayerResponse(
-            data={"basic": info[0], "banInfo": ban_info, "whitelistInfo": [_[0] for _ in wl_info]}  # type: ignore
+            data=PlayerInfoFull(
+                basic=cast(PlayerInfo, info),
+                banInfo=cast(BannedQQ | None, ban_info),
+                whitelistInfo=None if any(wl_info) else [cast(WLInfo, _) for _ in wl_info],
+            )
         )
     elif qq is None and uuid is None:
         return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="参数错误,至少需要传入一个参数")

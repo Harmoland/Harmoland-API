@@ -40,10 +40,10 @@ async def add_or_modify_player(
         await db.update_or_add(
             Player(
                 qq=qq,
-                joinTime=join_time or result[0].joinTime,
-                leaveTime=leave_time or result[0].leaveTime,
-                inviter=inviter or result[0].inviter,
-                hadWhitelist=had_whitelist or result[0].hadWhitelist,
+                joinTime=join_time or result.joinTime,
+                leaveTime=leave_time or result.leaveTime,
+                inviter=inviter or result.inviter,
+                hadWhitelist=had_whitelist or result.hadWhitelist,
             )
         )
     else:
@@ -90,9 +90,9 @@ async def add_new_whitelist(
     await db.update_or_add(
         Player(
             qq=qq,
-            joinTime=result[0].joinTime,
-            leaveTime=result[0].leaveTime,
-            inviter=result[0].inviter,
+            joinTime=result.joinTime,
+            leaveTime=result.leaveTime,
+            inviter=result.inviter,
             hadWhitelist=True,
         )
     )

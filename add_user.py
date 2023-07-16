@@ -19,12 +19,12 @@ async def main():
     #     print(f'\nError: {e}\n')
 
     try:
-        result: Sequence[User] | None = await db.select_first(select(User).where(User.qq == 731347477))
+        result: User | None = await db.select_first(select(User).where(User.qq == 731347477))
         print("result: ", result)
         if result is None:
             print("None")
             return
-        print(verify_password("test", result[0].passwd))
+        print(verify_password("test", result.passwd))
     except Exception as e:
         print(f"\nError: {e}\n")
 

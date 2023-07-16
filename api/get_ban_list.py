@@ -34,7 +34,7 @@ class BannedQQResponse(BaseResponse):
 )
 async def get_banned_qq(token=Depends(oauth2_scheme)):
     ban_info = await db.select_all(select(BannedQQList))
-    return BannedQQResponse(data=[cast(BannedQQ, _[0]) for _ in ban_info])
+    return BannedQQResponse(data=[cast(BannedQQ, _) for _ in ban_info])
 
 
 class BannedUUID(BaseModel):
@@ -61,4 +61,4 @@ class BannedUUIDResponse(BaseResponse):
 )
 async def get_banned_uuid(token=Depends(oauth2_scheme)):
     ban_info = await db.select_all(select(BannedUUIDList))
-    return BannedUUIDResponse(data=[cast(BannedUUID, _[0]) for _ in ban_info])
+    return BannedUUIDResponse(data=[cast(BannedUUID, _) for _ in ban_info])
