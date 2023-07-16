@@ -108,25 +108,26 @@ async def add_new_whitelist(
             data={"error": str(e)},
         )
 
-    if isinstance(mc_id, str):
-        rcon_client = await get_rcon_client()
-        try:
-            result = await rcon_client.send(f"whitelist add {mc_id}")
-        except Exception as e:
-            logger.exception(f"无法执行 Rcon 命令：【whitelist add {mc_id}】", e)
-            return BaseResponse(
-                code=status.HTTP_204_NO_CONTENT,
-                message=f"无法执行 Rcon 命令：【whitelist add {mc_id}】",
-                data={"error": str(e)},
-            )
-        else:
-            if result.startswith("Added"):
-                return BaseResponse()
-            else:
-                return BaseResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, message=result)
-    else:
+    if not isinstance(mc_id, str):
         return HttpErrorResponse(
             code=mc_id.status,
             message=f"向 mojang 查询【{uuid}】的正版 id 时获得意外内容",
             data=mc_id,
+        )
+
+    rcon_client = await get_rcon_client()
+    try:
+        result = await rcon_client.send(f"whitelist add {mc_id}")
+    except Exception as e:
+        logger.exception(f"无法执行 Rcon 命令：【whitelist add {mc_id}】", e)
+        return BaseResponse(
+            code=status.HTTP_204_NO_CONTENT,
+            message=f"无法执行 Rcon 命令：【whitelist add {mc_id}】",
+            data={"error": str(e)},
+        )
+    else:
+        return (
+            BaseResponse()
+            if result.startswith("Added")
+            else BaseResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, message=result)
         )
