@@ -20,7 +20,7 @@ from libs.database.types import EngineOptions
 
 # sqlite_url = 'sqlite+aiosqlite:///data/redbot.db'
 # mysql_url = 'mysql+aiomysql://user:pass@hostname/dbname?charset=utf8mb4
-T_Row = TypeVar('T_Row', bound=Base)
+T_Row = TypeVar("T_Row", bound=Base)
 
 
 class DatabaseManager:

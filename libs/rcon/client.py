@@ -95,7 +95,7 @@ class RconClient:
         if not self.connected:
             res = await self.try_reconect()
             if not res:
-                raise ValueError('Can not connect rcon server after 10 times retry.')
+                raise ValueError("Can not connect rcon server after 10 times retry.")
         request = Packet.make_command(command, *arguments, encoding=self.encoding)
         response = await self.communicate(request)
 
