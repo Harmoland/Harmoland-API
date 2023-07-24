@@ -37,7 +37,7 @@ class MainLoop(Launchable):
 launart = Launart()
 
 launart.add_service(FastAPIService(fastapi))
-launart.add_service(UvicornService())
+launart.add_service(UvicornService(host="127.0.0.1", port=8000))
 launart.add_service(AiohttpClientService())
 launart.add_service(DatabaseService())
 launart.add_service(RconService("127.0.0.1", 25575, passwd="111funnyguy"))
