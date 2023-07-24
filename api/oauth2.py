@@ -2,11 +2,14 @@ from datetime import timedelta
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from launart import Launart
 
-from libs.oauth2 import authenticate_user, create_token
+from libs.database.interface import Database
+from libs.database.model import User
+from libs.oauth2 import authenticate_user, create_token, get_password_hash
 from libs.oauth2.model import Token
 from libs.server import route
-from util import oauth2_scheme
+from util import BaseResponse, oauth2_scheme
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
@@ -23,3 +26,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @route.get("/whoami")
 async def who_am_i(token=Depends(oauth2_scheme)):
     return token
+
+
+@route.post("/add_user")
+async def add_user(qq: int, passwd: str, token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
+    try:
+        await db.add(User(qq=qq, passwd=get_password_hash(passwd)))
+    except Exception as e:
+        return BaseResponse(code=500, message=str(e))
