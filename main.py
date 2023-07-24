@@ -11,7 +11,7 @@ from graia.amnesia.builtins.aiohttp import AiohttpClientService
 from launart import Launart, Launchable
 from loguru import logger
 
-from libs.database.service import DatabaseInitService
+from libs.database.service import DatabaseService
 from libs.rcon.service import RconService
 from libs.server import fastapi
 from libs.server.service import FastAPIService, UvicornService
@@ -49,7 +49,7 @@ launart = Launart()
 launart.add_service(FastAPIService(fastapi))
 launart.add_service(UvicornService())
 launart.add_service(AiohttpClientService())
-launart.add_service(DatabaseInitService())
+launart.add_service(DatabaseService())
 launart.add_service(RconService("127.0.0.1", 25575, passwd="111funnyguy"))
 launart.add_launchable(MainLoop())
 

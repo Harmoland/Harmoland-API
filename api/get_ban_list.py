@@ -2,10 +2,11 @@ from typing import cast
 from uuid import UUID
 
 from fastapi import Depends
+from launart import Launart
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.sql import select
 
-from libs.database import db
+from libs.database.interface import Database
 from libs.database.model import BannedQQList, BannedUUIDList
 from libs.server import route
 from util import BaseResponse, oauth2_scheme
@@ -33,6 +34,7 @@ class BannedQQResponse(BaseResponse):
     tags=["封禁"],
 )
 async def get_banned_qq(token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
     ban_info = await db.select_all(select(BannedQQList))
     return BannedQQResponse(data=[cast(BannedQQ, _) for _ in ban_info])
 
@@ -60,5 +62,6 @@ class BannedUUIDResponse(BaseResponse):
     tags=["封禁"],
 )
 async def get_banned_uuid(token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
     ban_info = await db.select_all(select(BannedUUIDList))
     return BannedUUIDResponse(data=[cast(BannedUUID, _) for _ in ban_info])

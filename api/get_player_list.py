@@ -2,10 +2,11 @@ from typing import cast
 from uuid import UUID
 
 from fastapi import Depends, status
+from launart import Launart
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.sql import select
 
-from libs.database import db
+from libs.database.interface import Database
 from libs.database.model import BannedQQList, Player, UUIDList
 from libs.server import route
 from util import BaseResponse, oauth2_scheme
@@ -32,6 +33,7 @@ class PlayersResponse(BaseResponse):
     tags=["玩家"],
 )
 async def get_players_list(token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
     result = await db.select_all(select(Player))
     if result is None:
         return BaseResponse(code=status.HTTP_404_NOT_FOUND, message="未知的玩家")
@@ -74,6 +76,7 @@ class PlayerResponse(BaseResponse):
 )
 async def get_single_player_info(qq: int | None = None, uuid: UUID | None = None, token=Depends(oauth2_scheme)):
     # sourcery skip: remove-redundant-if
+    db = Launart.current().get_interface(Database)
     if qq is None and uuid is not None:
         wl_info = await db.select_first(select(UUIDList).where(UUIDList.uuid == uuid))
         if wl_info is None:

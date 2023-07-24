@@ -5,10 +5,11 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from launart import Launart
 from passlib.context import CryptContext
 from sqlalchemy.sql import select
 
-from libs.database import db
+from libs.database.interface import Database
 from libs.database.model import User
 
 # to get a string like this run:
@@ -32,6 +33,7 @@ class UnauthorizedException(HTTPException):
 
 async def get_user(qq: str) -> User | None:
     """从数据库中查询用户信息."""
+    db = Launart.current().get_interface(Database)
     return await db.select_first(select(User).where(User.qq == qq))
 
 

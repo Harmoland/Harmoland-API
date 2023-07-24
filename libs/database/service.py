@@ -1,13 +1,23 @@
 from typing import Literal
 
-from launart import ExportInterface, Launchable
+from launart import ExportInterface, Service
 from loguru import logger
 
-from libs.database import db
+from libs.database.interface import Database
+from libs.database.manager import DatabaseManager
 
 
-class DatabaseInitService(Launchable):
+class DatabaseService(Service):
     id: str = "database/init"
+    db: DatabaseManager
+    supported_interface_types: set[type[ExportInterface]] | dict[type[ExportInterface], float] = {Database}
+
+    def __init__(self, url: str = "sqlite+aiosqlite:///data/harmoland-console.db") -> None:
+        self.db = DatabaseManager(url)
+        super().__init__()
+
+    def get_interface(self, typ: type[Database]) -> Database:
+        return Database(self.db)
 
     @property
     def required(self) -> set[str | type[ExportInterface]]:
@@ -15,8 +25,15 @@ class DatabaseInitService(Launchable):
 
     @property
     def stages(self) -> set[Literal["preparing", "blocking", "cleanup"]]:
-        return set()
+        return {"preparing", "cleanup"}
 
     async def launch(self, _):
         logger.info("Initializing database...")
-        await db.initialize()
+        await self.db.initialize()
+        logger.success("Database initialized!")
+
+        async with self.stage("preparing"):
+            ...
+
+        async with self.stage("cleanup"):
+            await self.db.stop()

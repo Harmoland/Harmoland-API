@@ -1,10 +1,11 @@
 from uuid import UUID
 
 from fastapi import Depends, status
+from launart import Launart
 from loguru import logger
 from sqlalchemy.sql import select
 
-from libs.database import db
+from libs.database.interface import Database
 from libs.database.model import BannedQQList, BannedUUIDList, Player, UUIDList
 from libs.server import route
 from typings import HttpErrorResponse
@@ -28,6 +29,7 @@ async def add_or_modify_player(
     ignore_ban: bool = False,
     token=Depends(oauth2_scheme),
 ):
+    db = Launart.current().get_interface(Database)
     # 搜索是否已被Ban，有的话就拒绝
     if not ignore_ban:
         ban_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))
@@ -72,6 +74,7 @@ async def add_or_modify_player(
 async def add_new_whitelist(
     uuid: UUID, qq: int, add_time: int, operater: int, ignore_ban: bool = False, token=Depends(oauth2_scheme)
 ):
+    db = Launart.current().get_interface(Database)
     # 搜索是否已被Ban，有的话就拒绝
     if not ignore_ban:
         ban_qq_info = await db.select_first(select(BannedQQList).where(BannedQQList.qq == qq))

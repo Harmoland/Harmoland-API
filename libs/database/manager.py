@@ -1,6 +1,6 @@
 import contextlib
 from asyncio import current_task
-from collections.abc import Sequence
+from collections.abc import AsyncGenerator, Sequence
 from typing import Any, TypeVar, cast
 
 from sqlalchemy.engine.result import Result
@@ -73,7 +73,7 @@ class DatabaseManager:
         return self._scoped_session
 
     @contextlib.asynccontextmanager
-    async def async_session(self):
+    async def async_session(self) -> AsyncGenerator[async_scoped_session[AsyncSession], Any]:
         """异步session上下文管理封装.
 
         Returns:

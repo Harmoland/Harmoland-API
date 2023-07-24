@@ -1,11 +1,12 @@
 from uuid import UUID
 
 from fastapi import Depends, status
+from launart import Launart
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy.sql import select
 
-from libs.database import db
+from libs.database.interface import Database
 from libs.database.model import BannedQQList, BannedUUIDList, Player, UUIDList
 from libs.server import route
 from util import BaseResponse, get_rcon_client, oauth2_scheme
@@ -29,6 +30,7 @@ class BanResponse(BaseResponse):
 async def ban_player(
     qq: int, ban_start_time: int, ban_end_time: int, ban_reason: str, operater: int, token=Depends(oauth2_scheme)
 ):
+    db = Launart.current().get_interface(Database)
     await db.add(
         BannedQQList(
             qq=qq,
@@ -125,6 +127,7 @@ async def ban_player(
 async def ban_uuid(
     uuid: UUID, ban_start_time: int, ban_end_time: int, ban_reason: str, operater: int, token=Depends(oauth2_scheme)
 ):
+    db = Launart.current().get_interface(Database)
     await db.add(
         BannedUUIDList(
             uuid=uuid,
@@ -142,7 +145,7 @@ async def ban_uuid(
 
     qq = wl_result.qq
     failure: bool = False
-    failure_message: str = 'Failure'
+    failure_message: str = "Failure"
 
     # 有白名单，删除白名单
     await db.delete_exist(wl_result)
@@ -207,6 +210,7 @@ async def ban_uuid(
     tags=["封禁"],
 )
 async def pardon_player(ban_id: int, token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
     result = await db.select_first(select(BannedQQList).where(BannedQQList.qq == ban_id))
     if result is None:
         return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该 BanID 不存在")
@@ -232,6 +236,7 @@ async def pardon_player(ban_id: int, token=Depends(oauth2_scheme)):
     tags=["封禁"],
 )
 async def pardon_uuid(ban_id: UUID, token=Depends(oauth2_scheme)):
+    db = Launart.current().get_interface(Database)
     result = await db.select_first(select(BannedUUIDList).where(BannedUUIDList.uuid == ban_id))
     if result is None:
         return BaseResponse(code=status.HTTP_400_BAD_REQUEST, message="该 BanID 不存在")
@@ -247,7 +252,7 @@ async def pardon_uuid(ban_id: UUID, token=Depends(oauth2_scheme)):
         )
     )
     failure: bool = False
-    failure_message: str = 'Failure'
+    failure_message: str = "Failure"
     try:
         mc_id = await get_mc_id(result.uuid)
     except Exception as e:
