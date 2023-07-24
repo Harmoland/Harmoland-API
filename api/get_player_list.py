@@ -27,7 +27,7 @@ class PlayersResponse(BaseResponse):
 
 
 @route.get(
-    "/api/get_playerlist",
+    "/api/get_playerslist",
     response_model=PlayersResponse,
     summary="获取所有玩家列表",
     tags=["玩家"],

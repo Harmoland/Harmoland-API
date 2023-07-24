@@ -17,16 +17,6 @@ from libs.server import fastapi
 from libs.server.service import FastAPIService, UvicornService
 from util import loguru_handler
 
-logging.basicConfig(handlers=[loguru_handler], level=0, force=True)
-for name in logging.root.manager.loggerDict:
-    _logger = logging.getLogger(name)
-    for handler in _logger.handlers:
-        if isinstance(handler, StreamHandler):
-            _logger.removeHandler(handler)
-
-logger.remove()
-logger.add(sys.stderr, level="INFO", enqueue=True)
-
 
 class MainLoop(Launchable):
     id = "main"
@@ -57,6 +47,16 @@ launart.add_launchable(MainLoop())
 core_modules_path = Path("api")
 for module in pkgutil.iter_modules([str(core_modules_path)]):
     importlib.import_module(f"api.{module.name}", f"api.{module.name}")
+
+logging.basicConfig(handlers=[loguru_handler], level=0, force=True)
+for name in logging.root.manager.loggerDict:
+    _logger = logging.getLogger(name)
+    for handler in _logger.handlers:
+        if isinstance(handler, StreamHandler):
+            _logger.removeHandler(handler)
+
+logger.remove()
+logger.add(sys.stderr, level="INFO", enqueue=True)
 
 
 launart.launch_blocking()
