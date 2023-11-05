@@ -65,7 +65,7 @@ class PlayerInfoFull(BaseModel):
 
 
 class PlayerResponse(BaseResponse):
-    data: PlayerInfoFull
+    data: PlayerInfoFull | None
 
 
 @route.get(
