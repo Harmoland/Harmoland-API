@@ -3,10 +3,9 @@ import time
 from typing import Literal
 from uuid import UUID
 
-from aiohttp import ClientResponse
-from graia.amnesia.builtins.aiohttp import AiohttpClientInterface
 from launart import Launart
 
+from libs.aiohttp_service import AiohttpClientInterface
 from typings import HttpResp
 
 

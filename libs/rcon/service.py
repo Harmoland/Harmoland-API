@@ -1,6 +1,6 @@
-from typing import Literal
+from typing import Any, Literal
 
-from launart import ExportInterface, Launart, Service
+from launart import Launart, Service
 
 from libs.rcon.client import RconClient
 from libs.rcon.interface import Rcon
@@ -8,7 +8,7 @@ from libs.rcon.interface import Rcon
 
 class RconService(Service):
     id = "rcon/client"
-    supported_interface_types: set[type[ExportInterface]] | dict[type[ExportInterface], float] = {Rcon}
+    supported_interface_types: set[Any] = {Rcon}
     client: RconClient
     host: str
     port: int
@@ -36,7 +36,7 @@ class RconService(Service):
         return {"preparing", "cleanup"}
 
     @property
-    def required(self) -> set[str | type[ExportInterface]]:
+    def required(self) -> set[str]:
         return set()
 
     async def launch(self, _: Launart):

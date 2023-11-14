@@ -2,7 +2,6 @@ import contextlib
 from collections.abc import AsyncGenerator, Sequence
 from typing import TYPE_CHECKING, Any
 
-from launart import ExportInterface
 from sqlalchemy.engine.result import Result
 from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 from sqlalchemy.sql.base import Executable
@@ -13,10 +12,9 @@ from libs.database.model import Base
 
 if TYPE_CHECKING:
     from libs.database.manager import DatabaseManager
-    from libs.database.service import DatabaseService
 
 
-class DatabaseImpl(ExportInterface):
+class DatabaseImpl:
     db: "DatabaseManager"
 
     def __init__(self, db: "DatabaseManager"):
@@ -28,7 +26,7 @@ class DatabaseImpl(ExportInterface):
             return self.db.__getattribute__(name)
 
 
-class DatabaseStub(ExportInterface["DatabaseService"]):
+class DatabaseStub:
     db: "DatabaseManager"
 
     def __init__(self, db: "DatabaseManager"):

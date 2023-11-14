@@ -1,6 +1,6 @@
-from typing import Literal
+from typing import Any, Literal
 
-from launart import ExportInterface, Service
+from launart import Service
 from loguru import logger
 
 from libs.database.interface import Database
@@ -10,7 +10,7 @@ from libs.database.manager import DatabaseManager
 class DatabaseService(Service):
     id: str = "database/init"
     db: DatabaseManager
-    supported_interface_types: set[type[ExportInterface]] | dict[type[ExportInterface], float] = {Database}
+    supported_interface_types: set[Any] = {Database}
 
     def __init__(self, url: str = "sqlite+aiosqlite:///data/harmoland-console.db") -> None:
         self.db = DatabaseManager(url)
@@ -20,7 +20,7 @@ class DatabaseService(Service):
         return Database(self.db)
 
     @property
-    def required(self) -> set[str | type[ExportInterface]]:
+    def required(self) -> set[str]:
         return set()
 
     @property

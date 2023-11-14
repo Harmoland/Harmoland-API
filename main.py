@@ -7,10 +7,10 @@ import sys
 from logging import StreamHandler
 from pathlib import Path
 
-from graia.amnesia.builtins.aiohttp import AiohttpClientService
-from launart import Launart, Launchable
+from launart import Launart, Service
 from loguru import logger
 
+from libs.aiohttp_service import AiohttpClientService
 from libs.database.service import DatabaseService
 from libs.rcon.service import RconService
 from libs.server import fastapi
@@ -18,7 +18,7 @@ from libs.server.service import FastAPIService, UvicornService
 from util import loguru_handler
 
 
-class MainLoop(Launchable):
+class MainLoop(Service):
     id = "main"
 
     @property
@@ -36,12 +36,12 @@ class MainLoop(Launchable):
 
 launart = Launart()
 
-launart.add_service(FastAPIService(fastapi))
-launart.add_service(UvicornService(host="127.0.0.1", port=8000))
-launart.add_service(AiohttpClientService())
-launart.add_service(DatabaseService())
-launart.add_service(RconService("127.0.0.1", 25575, passwd="111funnyguy"))
-launart.add_launchable(MainLoop())
+launart.add_component(FastAPIService(fastapi))
+launart.add_component(UvicornService(app=fastapi, host="127.0.0.1", port=8000))
+launart.add_component(AiohttpClientService())
+launart.add_component(DatabaseService())
+launart.add_component(RconService("127.0.0.1", 25575, passwd="111funnyguy"))
+launart.add_component(MainLoop())
 
 # 加载api
 core_modules_path = Path("api")

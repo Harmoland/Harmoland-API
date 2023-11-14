@@ -1,13 +1,10 @@
 from typing import TYPE_CHECKING, Any
 
-from launart import ExportInterface
-
 if TYPE_CHECKING:
     from libs.rcon.client import RconClient
-    from libs.rcon.service import RconService
 
 
-class RconImpl(ExportInterface["RconService"]):
+class RconImpl:
     client: "RconClient"
 
     def __init__(self, client: "RconClient"):
@@ -19,7 +16,7 @@ class RconImpl(ExportInterface["RconService"]):
             return self.client.__getattribute__(name)
 
 
-class RconStub(ExportInterface["RconService"]):
+class RconStub:
     client: "RconClient"
 
     def __init__(self, client: "RconClient"):

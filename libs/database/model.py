@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from enum import Enum
+from typing import Literal
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -68,3 +70,27 @@ class BannedQQList(Base):
     banReason: Mapped[str] = col(VARCHAR(300), nullable=False, comment="封禁原因")
     pardon: Mapped[bool] = col(BOOLEAN(), nullable=False, default=False, comment="已解封")
     operater: Mapped[int] = col(BIGINT(), nullable=False, comment="封禁操作者QQ")
+
+
+class Operate(Enum):
+    newMember = 0
+    addWhitelist = 1
+    delWhitelist = 2
+    banUUID = 3
+    banQQ = 4
+    pardonUUID = 5
+    pardonQQ = 6
+    login = 7
+    getBannedQQ = 8
+    getBannedUUID = 9
+    getPlayersList = 10
+    getPlayerInfo = 11
+
+
+# @dataclass
+# class OperateLog(Base):
+#     __tablename__ = "harmoland_operate_log"
+
+#     id: Mapped[int] = col(INTEGER(), primary_key=True)
+#     operater: Mapped[int] = col(BIGINT(), nullable=False, index=True, comment="操作者")
+#     type: Mapped[Literal['add', 'ban', 'pardon', 'login', 'del', 'get']]
